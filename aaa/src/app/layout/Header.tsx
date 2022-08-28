@@ -1,4 +1,4 @@
-import { Box, AppBar, Toolbar, IconButton, Typography,  Switch, Badge, List, ListItem } from '@mui/material'
+import { Box, AppBar, Toolbar, IconButton, Typography, Button, Switch, colors, Badge, List, ListItem, ListItemButton, ListItemText } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { NavLink } from 'react-router-dom';
 
@@ -46,7 +46,7 @@ export default function Header(props : any) {
                 
                 <List sx= {{display:"flex",alignItems:"center"}}>
                   {midLinks.map(({title,path}) => (
-                  <ListItem key={title} component={NavLink} to={path} sx={navStyles}> {title} </ListItem>))}
+                  <ListItem component={NavLink} to={path} sx={navStyles}> {title} </ListItem>))}
                  </List>
                 
 
@@ -59,7 +59,7 @@ export default function Header(props : any) {
 
                <List sx= {{display:"flex",alignItems:"center"}}>
                   {rightLinks.map(({title,path}) => (
-                  <ListItem key={title} component={NavLink} to={path} sx={navStyles}> {title} </ListItem>))}
+                  <ListItem component={NavLink} to={path} sx={navStyles}> {title} </ListItem>))}
                  </List>
               </Box>
 
