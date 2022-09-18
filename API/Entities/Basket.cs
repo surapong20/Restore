@@ -7,7 +7,7 @@ namespace API.Entities
 {
     public class Basket
     {
-        public int id {get; set;}
+        public int Id {get; set;}
         public string BuyerId {get; set;}
 
         //สร้างไฟล์ BasketItems ให้โดยอัตโนมัติ

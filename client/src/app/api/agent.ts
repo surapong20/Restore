@@ -1,15 +1,18 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { history } from "../..";
 
 
 axios.defaults.baseURL = "http://localhost:5000/api/"
 
+axios.defaults.withCredentials = true //อนุญาตให้เข้าถึงคุกกี้ที่ browser ได้
+
 const ResponseBody = (response: AxiosResponse) => response.data
 
 const sleep = () => new Promise((_) => setTimeout(_, 200))
 
+//You can intercept requests or responses before they are handled by then or catch.
+//.use มี Promise คือ onFullfill กรณีสำเร็จ onReject กรณีมีข้อผิดพลาด
 axios.interceptors.response.use(async response => {
     await sleep()
     return response
@@ -51,25 +54,34 @@ axios.interceptors.response.use(async response => {
 })
 
 const requests = {
-    get: (url: string) => axios.get(url).then(ResponseBody)
+    get: (url: string) => axios.get(url).then(ResponseBody),
+    post : (url: string,body?:{}) => axios.post(url,body).then(ResponseBody),
+    delete: (url: string) => axios.delete(url).then(ResponseBody),
 }
 
 const Catalog = {
-    list: () => requests.get("Products"),
-    details: (id: number) => requests.get(`products/${id}`),
+    list: () => requests.get("Product"),
+    details: (id: number) => requests.get(`product/${id}`),
 }
 
 const TestErrors = {
     get400Error: () => requests.get('buggy/GetBadRequest'),
     get401Error: () => requests.get('buggy/GetUnAuthorized'),
-    get404Error: () => requests.get("Buggy/GetNotFound"),
+    get404Error: () => requests.get("buggy/GetNotFound"),
     get500Error: () => requests.get('buggy/GetServerError'),
     getValidationError: () => requests.get('buggy/GetValidationError')
 }
 
+const Basket = {
+    get : () => requests.get('basket'),
+    addItem : (productId: number,quantity=1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`,{}),
+    removeItem : (productId: number,quantity=1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`)
+}
+
 const agent = {
     Catalog,
-    TestErrors
+    TestErrors,
+    Basket
 }
 
 export default agent
