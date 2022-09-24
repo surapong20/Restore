@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Badge, IconButton, List, ListItem, Switch } from "@mui/material";
 import { Link, NavLink } from "react-router-dom";
-import { useStoreContext } from "../context/StoreContext";
+import { useAppSelector } from "../store/configureStore";
 
 const midLinks = [
   { title: "catalog", path: "/catalog" },
@@ -31,7 +31,7 @@ const navStyles = {
 };
 
 export default function Header(props: any) {
-  const { basket } = useStoreContext();
+  const {basket} = useAppSelector(state=>state.basket)
   const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -50,8 +50,9 @@ export default function Header(props: any) {
               onChange={props.handleMode}
               color="default"
             />
-
-            <Typography variant="h6">K.U.Y</Typography>
+            
+            <IconButton component={Link} to="/"><Typography variant="h6" >K.U.Y</Typography></IconButton>
+            
           </Box>
 
           <List sx={{ display: "flex" }}>

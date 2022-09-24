@@ -9,7 +9,7 @@ axios.defaults.withCredentials = true //อนุญาตให้เข้า�
 
 const ResponseBody = (response: AxiosResponse) => response.data
 
-const sleep = () => new Promise((_) => setTimeout(_, 200))
+const sleep = () => new Promise((_) => setTimeout(_, 500))
 
 //You can intercept requests or responses before they are handled by then or catch.
 //.use มี Promise คือ onFullfill กรณีสำเร็จ onReject กรณีมีข้อผิดพลาด
