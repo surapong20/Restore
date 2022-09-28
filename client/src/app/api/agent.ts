@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
+import { PaginatedResponse } from "../models/pagination";
 
 
 axios.defaults.baseURL = "http://localhost:5000/api/"
@@ -15,6 +16,11 @@ const sleep = () => new Promise((_) => setTimeout(_, 500))
 //.use มี Promise คือ onFullfill กรณีสำเร็จ onReject กรณีมีข้อผิดพลาด
 axios.interceptors.response.use(async response => {
     await sleep()
+    const pagination = response.headers['pagination']; //ส่งมาจาก ProductController
+    if (pagination) {
+        response.data = new PaginatedResponse(response.data, JSON.parse(pagination));
+        return response;
+    }
     return response
 }, (error: AxiosError) => {
     var data = error.response?.data  //obj ที่ไม่รู้ชนิด
@@ -53,15 +59,17 @@ axios.interceptors.response.use(async response => {
 
 })
 
+//params?: URLSearchParams ใช้รับค่าพารามิเตอ์แบบออบเจคที่มีหลายๆค่า เทีบบเท่า query string
 const requests = {
-    get: (url: string) => axios.get(url).then(ResponseBody),
+    get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(ResponseBody),
     post : (url: string,body?:{}) => axios.post(url,body).then(ResponseBody),
     delete: (url: string) => axios.delete(url).then(ResponseBody),
 }
 
 const Catalog = {
-    list: () => requests.get("Product"),
-    details: (id: number) => requests.get(`product/${id}`),
+    list: (params: URLSearchParams) => requests.get('products', params),
+    details: (id: number) => requests.get(`products/${id}`),
+    fetchFilters: () => requests.get('products/filters'),
 }
 
 const TestErrors = {
@@ -77,6 +85,7 @@ const Basket = {
     addItem : (productId: number,quantity=1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`,{}),
     removeItem : (productId: number,quantity=1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`)
 }
+
 
 const agent = {
     Catalog,
