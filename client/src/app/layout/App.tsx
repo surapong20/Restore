@@ -4,7 +4,7 @@ import {
   CssBaseline,
   ThemeProvider,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback,useEffect,useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,35 +20,38 @@ import ServerError from "../errors/ServerError";
 import Header from "./Header";
 import LoadingComponent from "./LoadingComponent";
 import { useAppDispatch, useAppSelector } from "../store/configureStore";
-import { getCookie } from "../util/util";
-import agent from "../api/agent";
-import { setBasket } from "../../features/basket/basketSlice";
+import { fetchBasketAsync} from "../../features/basket/basketSlice";
+import Login from "../../features/account/Login";
+import Register from "../../features/account/Register";
+import { fetchCurrentUser } from "../../features/account/accountSlice";
+import { PrivateLogin, PrivateRoute } from "./PrivateRoute";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const {fullscreen} = useAppSelector(state=>state.screen)
+  const { fullscreen } = useAppSelector((state) => state.screen);
   const dispatch = useAppDispatch();
 
   const [mode, setMode] = useState(true);
   const displayMode = mode ? "light" : "dark";
 
-  useEffect(() => {
-    const buyerId = getCookie("buyerId");
-    if (buyerId) {
-      agent.Basket.get()
-        .then((basket) => dispatch(setBasket(basket)))
-        .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
-    } else setLoading(false);
+  const initApp = useCallback(async () => {
+    try {
+      await dispatch(fetchCurrentUser());
+      await dispatch(fetchBasketAsync());
+    } catch (error) {
+      console.log(error);
+    }
   }, [dispatch]);
 
-
+  useEffect(() => {
+    initApp().then(() => setLoading(false));
+  }, [initApp]);
+  
   const darkTheme = createTheme({
     palette: {
       mode: displayMode,
     },
   });
-  
 
   if (loading) return <LoadingComponent message="Initilize App....." />;
 
@@ -63,13 +66,18 @@ export default function App() {
           autoClose={1000}
         />
         <CssBaseline />
-        <Header handleMode={handleMode} />{fullscreen ? <>{mainrouter}</> :<Container sx={{mt:2}}>{mainrouter}</Container>}
+        <Header handleMode={handleMode} />
+        {fullscreen ? (
+          <>{mainrouter}</>
+        ) : (
+          <Container sx={{ mt: 2 }}>{mainrouter}</Container>
+        )}
       </ThemeProvider>
     </>
   );
 }
 
-const mainrouter = 
+const mainrouter = (
   <Routes>
     <Route path="/" element={<HomePage />} />
     <Route path="/about" element={<AboutPage />} />
@@ -80,5 +88,18 @@ const mainrouter =
     <Route path="/checkout" element={<CheckoutPage />} />
     <Route path="/server-error" element={<ServerError />} />
     <Route path="*" element={<NotFound />} />
-  </Routes>
+    <Route path="/register" element={<Register />} />
+    <Route
+              path="/login"
+              element={
+                <PrivateLogin>
+                  <Login />
+                </PrivateLogin>
+              }
+            />
+            <Route element={<PrivateRoute />}>
+              <Route path="/checkout" element={<CheckoutPage />} />
+            </Route>
 
+  </Routes>
+);
