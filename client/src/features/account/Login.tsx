@@ -15,7 +15,7 @@ import { signInUser } from "./accountSlice";
 import {history} from "../.."
 
 export default function Login() {
-  const dispatch = useAppDispatch();
+  const dispatch1 = useAppDispatch();
 
   const {
     register,
@@ -26,7 +26,7 @@ export default function Login() {
   //FieldValues คือ ค่าทั้งหมดภายใน Form
   async function submitForm(data: FieldValues) {
     try {
-      await dispatch(signInUser(data)); 
+      await dispatch1(signInUser(data)); 
       history.push("/catalog"); //มาจาก index.tsx
      } catch (error) {
       console.log(error)

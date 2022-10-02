@@ -1,19 +1,18 @@
-
-import { createAsyncThunk, createSlice, isAnyOf } from '@reduxjs/toolkit'
-import agent from '../../app/api/agent';
-import { Basket } from '../../app/models/Basket'
-import { getCookie } from '../../app/util/util';
-
-export interface BasketState {
+import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import agent from "../../app/api/agent";
+import { Basket } from "../../app/models/Basket";
+import { getCookie } from "../../app/util/util";
+ 
+interface BasketState {
     basket: Basket | null;
-    status : string;
+    status: string;
 }
-
+ 
 const initialState: BasketState = {
     basket: null,
     status: 'idle'
 }
-
+ 
 export const fetchBasketAsync = createAsyncThunk<Basket>(
     'basket/fetchBasketAsync',
     async (_, thunkAPI) => {
@@ -29,10 +28,9 @@ export const fetchBasketAsync = createAsyncThunk<Basket>(
         }
     }
 )
-
-//createAsyncThunk<return, input parameter, {}>
-//rejectWithValue ส่ง axios interceptors
-export const addBasketItemAsync = createAsyncThunk<Basket,{ productId: number, quantity? : number} >(
+ 
+//createAsyncThunk<ชนิดพารามิเตอร์ที่ return ออก , {พารามิเตอร์ที่รับเข้ามา}>
+export const addBasketItemAsync = createAsyncThunk<Basket, { productId: number, quantity?: number }>(
     'basket/addBasketItemAsync',
     async ({ productId, quantity = 1 }, thunkAPI) => {
         try {
@@ -42,7 +40,8 @@ export const addBasketItemAsync = createAsyncThunk<Basket,{ productId: number, q
         }
     }
 )
-
+ 
+//createAsyncThunk<ชนิดพารามิเตอร์ที่ return ออก , {พารามิเตอร์ที่รับเข้ามา}>
 export const removeBasketItemAsync = createAsyncThunk<void, { productId: number, quantity: number, name?: string }>(
     'basket/removeBasketItemAsync',
     async ({ productId, quantity }, thunkAPI) => {
@@ -53,7 +52,7 @@ export const removeBasketItemAsync = createAsyncThunk<void, { productId: number,
         }
     }
 )
-
+ 
 export const basketSlice = createSlice({
     name: 'basket',
     initialState,
@@ -64,11 +63,11 @@ export const basketSlice = createSlice({
         clearBasket: (state) => {
             state.basket = null;
         }
-
     },
-    extraReducers: builder => {
+    extraReducers: (builder => {
         builder.addCase(addBasketItemAsync.pending, (state, action) => {
             state.status = 'pendingAddItem' + action.meta.arg.productId
+            console.log(action)
         });
         builder.addCase(removeBasketItemAsync.pending, (state, action) => {
             state.status = 'pendingRemoveItem' + action.meta.arg.productId + action.meta.arg.name;
@@ -94,15 +93,9 @@ export const basketSlice = createSlice({
             console.log(action.payload);
             state.status = 'idle';
         });
-
-
-    }
+ 
+    })
+ 
 })
-
-
-
-
-// Action creators are generated for each case reducer function
-export const { setBasket,clearBasket} = basketSlice.actions
-
-export default basketSlice.reducer
+ 
+export const { setBasket, clearBasket } = basketSlice.actions

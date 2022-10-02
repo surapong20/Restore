@@ -27,7 +27,7 @@ export default function HomePage() {
       <h2> Single Item</h2>
       <Slider {...settings}>
         {[1, 2, 3, 4, 5].map((item) => (
-          <img src="https://picsum.photos/200/300" height="500px" />
+          <img src="https://picsum.photos/200/300" key={item} height="500px" />
         ))}
       </Slider>
     </div>

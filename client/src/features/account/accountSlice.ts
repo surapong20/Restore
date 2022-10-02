@@ -86,4 +86,4 @@ export const accountSlice = createSlice({
 
 export const { signOut, setUser } = accountSlice.actions
 
-export default accountSlice.reducer
+export default accountSlice.actions
