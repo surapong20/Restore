@@ -7,7 +7,7 @@ using API.Extenstions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
- 
+
 namespace API.Controllers
 {
     [Authorize]
@@ -18,7 +18,7 @@ namespace API.Controllers
         {
             _context = context;
         }
- 
+
         [HttpGet]
         public async Task<ActionResult<List<OrderDto>>> GetOrders()
         {
@@ -27,7 +27,7 @@ namespace API.Controllers
                .Where(x => x.BuyerId == User.Identity.Name)
                .ToListAsync();
         }
- 
+
         [HttpGet("{id}", Name = "GetOrder")]
         public async Task<ActionResult<OrderDto>> GetOrder(int id)
         {
@@ -36,22 +36,22 @@ namespace API.Controllers
                 .Where(x => x.BuyerId == User.Identity.Name && x.Id == id)
                 .FirstOrDefaultAsync();
         }
- 
+
         [HttpPost]
         public async Task<ActionResult<int>> CreateOrder(CreateOrderDto orderDto)
         {
             var basket = await _context.Baskets
                 .RetrieveBasketWithItems(User.Identity.Name)
                 .FirstOrDefaultAsync();
- 
+
             if (basket == null) return BadRequest(new ProblemDetails { Title = "Could not locate basket" });
- 
+
             var items = new List<OrderItem>(); //รายการสินค้าสั่งซื้อทั้งหมด
- 
+
             foreach (var item in basket.Items)
             {
                 var productItem = await _context.Products.FindAsync(item.ProductId);
- 
+
                 //รายชื่อสินค้าหนึ่งรายการ
                 var itemOrdered = new ProductItemOrdered
                 {
@@ -59,7 +59,7 @@ namespace API.Controllers
                     Name = productItem.Name,
                     PictureUrl = productItem.PictureUrl
                 };
- 
+
                 //สินค้าที่สั่งซื้อ จำนวนและราคา
                 var orderItem = new OrderItem
                 {
@@ -70,10 +70,10 @@ namespace API.Controllers
                 items.Add(orderItem); //แอดรายการสินค้าทั้งหมดที่สั่งซื้อ
                 productItem.QuantityInStock -= item.Quantity; //ลดจำนวนสินค้าในสต๊อก
             }
- 
+
             var subtotal = items.Sum(item => item.Price * item.Quantity);
             var deliveryFee = subtotal > 10000 ? 0 : 500;
- 
+
             //รวบรวม Order,OrderItems
             var order = new Order
             {
@@ -82,18 +82,20 @@ namespace API.Controllers
                 ShippingAddress = orderDto.ShippingAddress,
                 Subtotal = subtotal,
                 DeliveryFee = deliveryFee,
+                PaymentIntentId = basket.PaymentIntentId
+
             };
- 
+
             _context.Orders.Add(order); //สร้าง Order และ OrderItem ในขั้นตอนเดียว
             _context.Baskets.Remove(basket);  //ลบ  Basket และ BasketItem ในขั้นตอนเดียว
- 
- 
+
+
             if (orderDto.SaveAddress)   //กรณีต้องการบันทึกที่อยุ่จัดส่งลง UserAddress
             {
                 var user = await _context.Users
                     .Include(a => a.Address)
                     .FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
- 
+
                 var address = new UserAddress
                 {
                     FullName = orderDto.ShippingAddress.FullName,
@@ -106,14 +108,14 @@ namespace API.Controllers
                 };
                 user.Address = address;
             }
- 
+
             //บันทึกทุก transaction ครั้งเดียว
             var result = await _context.SaveChangesAsync() > 0;
- 
+
             if (result) return CreatedAtRoute("GetOrder", new { id = order.Id }, order.Id);
- 
+
             return BadRequest(new ProblemDetails { Title = "Problem creating order" });
         }
- 
+
     }
 }

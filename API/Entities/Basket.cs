@@ -1,19 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace API.Entities
 {
     public class Basket
     {
-        public int Id {get; set;}
-        public string BuyerId {get; set;}
-
-        //สร้างไฟล์ BasketItems ให้โดยอัตโนมัติ
-        public List<BasketItem> Items {get; set;} = new();
-
-         public void AddItem(Product product, int quantity)
+        public int Id { get; set; }
+        public string BuyerId { get; set; }
+        public List<BasketItem> Items { get; set; } = new(); //Include BasketItem มาโดยอัตโนมัติ
+        public string? PaymentIntentId { get; set; }
+        public string? ClientSecret { get; set; }
+ 
+        public void AddItem(Product product, int quantity)
         {
             if (Items.All(item => item.ProductId != product.Id))
             {
@@ -32,7 +27,5 @@ namespace API.Entities
             item.Quantity -= quantity;
             if (item.Quantity <= 0) Items.Remove(item);
         }
-
-
     }
 }

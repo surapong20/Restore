@@ -17,7 +17,7 @@ namespace API.Data
                     Email = "puy@test.com"
                 };
  
-                await userManager.CreateAsync(user, "Pa$$w0rd"); //ทำการ hash Password
+                await userManager.CreateAsync(user,"Pa$$w0rd"); //ทำการ hash Password
                 await userManager.AddToRoleAsync(user, "Member"); // มี Role เดียว
  
                 var admin = new User

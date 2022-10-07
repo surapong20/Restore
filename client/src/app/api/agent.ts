@@ -56,7 +56,7 @@ axios.interceptors.response.use(async response => {
             toast.error(result.title)
             break;
         case 500:
-       history.push('/server-error',{state:data})
+            history.push('/server-error', { state: data })
             toast.error(result.title)
             break;
 
@@ -70,8 +70,8 @@ axios.interceptors.response.use(async response => {
 
 //params?: URLSearchParams ใช้รับค่าพารามิเตอ์แบบออบเจคที่มีหลายๆค่า เทีบบเท่า query string
 const requests = {
-    get: (url: string, params?: URLSearchParams) => axios.get(url, {params}).then(ResponseBody),
-    post : (url: string,body?:{}) => axios.post(url,body).then(ResponseBody),
+    get: (url: string, params?: URLSearchParams) => axios.get(url, { params }).then(ResponseBody),
+    post: (url: string, body?: {}) => axios.post(url, body).then(ResponseBody),
     delete: (url: string) => axios.delete(url).then(ResponseBody),
 }
 
@@ -90,10 +90,11 @@ const TestErrors = {
 }
 
 const Basket = {
-    get : () => requests.get('basket'),
-    addItem : (productId: number,quantity=1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`,{}),
-    removeItem : (productId: number,quantity=1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`)
+    get: () => requests.get('basket'),
+    addItem: (productId: number, quantity = 1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`, {}),
+    removeItem: (productId: number, quantity = 1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`)
 }
+
 
 const Account = {
     login: (values: any) => requests.post('account/login', values),
@@ -107,6 +108,10 @@ const Orders = {
     fetch: (id: number) => requests.get(`orders/${id}`),
     create: (values: any) => requests.post('orders', values)
 }
+const Payments = {
+    createPaymentIntent: () => requests.post('payments', {})
+}
+
 
 
 const agent = {
@@ -114,7 +119,8 @@ const agent = {
     TestErrors,
     Basket,
     Account,
-    Orders
+    Orders,
+    Payments
 }
 
 export default agent

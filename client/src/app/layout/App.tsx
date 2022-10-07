@@ -4,7 +4,7 @@ import {
   CssBaseline,
   ThemeProvider,
 } from "@mui/material";
-import { useCallback,useEffect,useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,12 +20,13 @@ import ServerError from "../errors/ServerError";
 import Header from "./Header";
 import LoadingComponent from "./LoadingComponent";
 import { useAppDispatch, useAppSelector } from "../store/configureStore";
-import { fetchBasketAsync} from "../../features/basket/basketSlice";
+import { fetchBasketAsync } from "../../features/basket/basketSlice";
 import Login from "../../features/account/Login";
 import Register from "../../features/account/Register";
 import { fetchCurrentUser } from "../../features/account/accountSlice";
 import { PrivateLogin, PrivateRoute } from "./PrivateRoute";
 import OrderPage from "../../features/orders/OrderPage";
+import CheckoutWrapper from "../../features/checkout/CheckoutWrapper";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -47,7 +48,7 @@ export default function App() {
   useEffect(() => {
     initApp().then(() => setLoading(false));
   }, [initApp]);
-  
+
   const darkTheme = createTheme({
     palette: {
       mode: displayMode,
@@ -91,17 +92,17 @@ const mainrouter = (
     <Route path="*" element={<NotFound />} />
     <Route path="/register" element={<Register />} />
     <Route
-              path="/login"
-              element={
-                <PrivateLogin>
-                  <Login />
-                </PrivateLogin>
-              }
-            />
-            <Route element={<PrivateRoute />}>
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/order" element={<OrderPage/>}/>
-            </Route>
-
+      path="/login"
+      element={
+        <PrivateLogin>
+          <Login />
+        </PrivateLogin>
+      }
+    />
+    <Route element={<PrivateRoute />}>
+      <Route path="/checkout" element={<CheckoutWrapper />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/orders" element={<OrderPage />} />
+    </Route>
   </Routes>
 );
